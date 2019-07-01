@@ -1,10 +1,3 @@
-// Then create a Node application called bamazonCustomer.js. Running this application will first display all of the items available for sale. Include the ids, names, and prices of products for sale.
-// The app should then prompt users with two messages.
-
-// The first should ask them the ID of the product they would like to buy.
-
-// The second message should ask how many units of the product they would like to buy.
-
 // Once the customer has placed the order, your application should check if your store has enough of the product to meet the customer's request.
 
 // If not, the app should log a phrase like Insufficient quantity!, and then prevent the order from going through.
@@ -34,28 +27,32 @@ var connection = mysql.createConnection({
 function displayAllProd() {
     connection.query("SELECT * FROM products", function(err, results) {
         if (err) throw err;
+        console.log(`\nProducts for purchase:\n----------------------------------------------------------------------`)
         for (var i = 0; i < results.length; i++) {
-        console.log(`ID: ${results[i].id} | Item: ${results[i].product_name} | Dept: ${results[i].department_name} | Price: ${results[i].price}`);
+        console.log(`ID: ${results[i].id} | Item: ${results[i].product_name} | Dept: ${results[i].department_name} | Price: $${results[i].price}`);
         }
-        console.log("-----------------------------------");
+        console.log(`----------------------------------------------------------------------\n`);
 
     inquirer.prompt([
         {
             name: "id",
             type: "list",
-            message: "Select the product ID that you would like to purchase?",
-            choices: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            message: "Select the product ID that you would like to purchase:",
+            choices: [`ID: ${results[0].id} | Item: ${results[0].product_name}`, `ID: ${results[1].id} | Item: ${results[1].product_name}`, `ID: ${results[2].id} | Item: ${results[2].product_name}`, `ID: ${results[3].id} | Item: ${results[3].product_name}`, `ID: ${results[4].id} | Item: ${results[4].product_name}`, `ID: ${results[5].id} | Item: ${results[5].product_name}`, `ID: ${results[6].id} | Item: ${results[6].product_name}`, `ID: ${results[7].id} | Item: ${results[7].product_name}`, `ID: ${results[8].id} | Item: ${results[8].product_name}`, `ID: ${results[9].id} | Item: ${results[9].product_name}`]
+
         },
         {
             name: "quantity",
             type: "input",
             message: "How many units of the product would you like to purchase?",
+            //validate if a number
         }
         ]).then(function(answers) {
             console.log(answers);
             // placeOrder(answers.id, answers.quantity);
         });
     });
+
 
 }
   
@@ -78,6 +75,9 @@ function displayAllProd() {
     //     );
     //     console.log(query.sql);
     // };
+    //read the stock quantity for the product they selected
+    //if user input <= stock quantity, then place order and deduct stock accordingly, log price to customer which will be unit cost times the user input quantity
+    //if user input > stock quantity, then log Insufficient quantity and cancel order
 
 
 
