@@ -90,22 +90,23 @@ function placeOrder(answers) {
             return;
         } else {
             updateStock(answers);
-            console.log(`Your order for ${answers.quantity} unit(s) of ${res.product_name} has been placed.\nYour total was $` + (res.price * answers.quantity));  
+            function updateStock(answers) {
+
+                var query = "UPDATE products SET ? WHERE ? ";
+                var newQty = res.stock_quantity - answers.quantity
+            
+                connection.query(query, [ {stock_quantity: newQty}, {id: answers.id} ], function(err) {
+                      if (err) throw err;
+                    //   console.log(`Updated stock.`);            
+                    }
+                );
+            };
+            console.log(`Your order for ${answers.quantity} unit(s) of the ${res.product_name} has been placed.\nYour total was $` + (res.price * answers.quantity));  
         }
     })
 };
 
-function updateStock(answers) {
-    
-    connection.query("UPDATE products SET ? WHERE ?",
-        [ { stock_quantity: stock_quantity - answers.quantity }, { id: answers.id } ],
-        function(error) {
-          if (error) throw err;
-      
-          console.log(res.stock_quantity)            
-        }
-    );
-};
+
 
 
     
