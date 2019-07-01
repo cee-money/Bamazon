@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/cee-money/Bamazon#readme",
   "dependencies": {
+    "cli-table": "^0.3.1",
     "inquirer": "^6.4.1",
-    "mysql": "^2.17.1"
+    "install": "^0.12.2",
+    "mysql": "^2.17.1",
+    "npm": "^6.9.2"
   }
 }
