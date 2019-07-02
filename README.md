@@ -2,10 +2,12 @@
 
 Bamazon is an Amazon-like storefront built using MySQL and node.js. This is a CLI app and thus is not deployed - this is a link to a demo video below. Bamazon takes in orders from customers and depletes stock from the store's inventory (stored in a MySql database). It also has a manager view which allows for adding stock and new products to the database.
 
-Link to video walk-through: 
+Link to video walk-through: https://drive.google.com/file/d/1lzUOhhZGlyVDBbpODcI_SuJ6x99l_aa4/view?usp=sharing
 
 
 App overview:
+
+Be sure to enter npm i into your command line prior to running the application.
 
 One file is bamazonCustomer.js. Running this file will first display all of the items available for sale, then prompt users with two messages:
 

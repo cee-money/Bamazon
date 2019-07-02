@@ -139,7 +139,10 @@ function addInv() {
         ]).then(function(answers) {
 
                 var query = "UPDATE products SET ? WHERE ? ";
-                var newQty = parseInt(res[0].stock_quantity) + parseInt(answers.quantity);
+
+                var i = parseInt(answers.item) - 1;
+
+                var newQty = parseInt(res[i].stock_quantity) + parseInt(answers.quantity);
 
                 connection.query(query, [ {stock_quantity: newQty}, {id: answers.item} ], function(err) {
                         if (err) throw err;
@@ -189,7 +192,7 @@ function addProd() {
           stock_quantity: answers.stock
         },
         function(err) {
-          console.log("Item successfully added!");
+          console.log("\n----------------------------------------------------------------------\n\nItem successfully added!\n\n----------------------------------------------------------------------\n");
           userPrompt();
         }
       );

@@ -86,7 +86,7 @@ function placeOrder(answers) {
         // console.log(res.stock_quantity);
 
         if (answers.quantity > res.stock_quantity) {
-            console.log(`Insufficient stock. Your order has been canceled.`);
+            console.log(`\n\n----------------------------------------------------------------------\nInsufficient stock. Your order has been canceled.\n\----------------------------------------------------------------------\n\n`);
             orderAgain();
             return;
         } else {
