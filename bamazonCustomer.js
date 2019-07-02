@@ -1,10 +1,9 @@
+// Requiring various NPMs
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require('cli-table');
 
-var divider = `\n----------------------------------------------------------------------\n`
-
-
+// Preparing to connect to the bamazon database
 var connection = mysql.createConnection({
     host: "localhost",
     port: 8889,
@@ -12,7 +11,8 @@ var connection = mysql.createConnection({
     password: "root",
     database: "bamazon"
 });
-  
+
+// Upon connecting to the bamazon database, run the displayAllProd function
 connection.connect(function(err) {
       if (err) throw err;
       // console.log(`\nconnected as id ${connection.threadId}\n`);
@@ -20,8 +20,9 @@ connection.connect(function(err) {
 
 }); 
 
+// Displays product from the bamazon database in a table and runs inquirer to receive input from the customer in order to place their order
 function displayAllProd() {
-    connection.query("SELECT * FROM products", function(err, results) {
+    connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
         console.log(`\nProducts for purchase:\n`)
 
@@ -30,26 +31,24 @@ function displayAllProd() {
           , colWidths: [7, 25, 25, 10]
         });
 
-        for (var i = 0; i < results.length; i++) {
+        for (var i = 0; i < res.length; i++) {
 
-            table.push(
-                [results[i].id, results[i].product_name, results[i].department_name, `$${results[i].price}`]
-            );
+            table.push([res[i].id, res[i].product_name, res[i].department_name, `$${res[i].price}`]);
         }
         console.log(table.toString());
-        console.log(divider);
+        console.log(`\n----------------------------------------------------------------------\n`);
 
         inquirer.prompt([
             {
                 name: "id",
                 type: "input",
-                message: "What is the ID # of the product you would like to purchase:",
+                message: "What is the ID # of the product you would like to purchase?",
                 validate: function(value) {
                     if (isNaN(value)) {
                         console.log(`Please input a number`);
                         return false;
                     }
-                    return true
+                    return true;
                 }
             },
             {
@@ -61,7 +60,7 @@ function displayAllProd() {
                         console.log(`Please input a number`);
                         return false;
                     }
-                    return true
+                    return true;
                 }
             }
             ]).then(function(answers) {
@@ -71,9 +70,10 @@ function displayAllProd() {
     });
 };
 
+// Checks the bamazon database to ensure adequate stock to fill customer's order request and either cancels or places order
 function placeOrder(answers) {
 
-    console.log(`${divider}\u231B  Processing your order... \n`);
+    console.log(`\n----------------------------------------------------------------------\n\u231B  Processing your order...`);
     var query = "SELECT id, product_name, price, stock_quantity FROM products WHERE ? ";
     
     connection.query(query, {id: answers.id}, function(err, res) {
@@ -87,13 +87,16 @@ function placeOrder(answers) {
 
         if (answers.quantity > res.stock_quantity) {
             console.log(`Insufficient stock. Your order has been canceled.`);
+            orderAgain();
             return;
         } else {
             updateStock(answers);
+
+            //if order is placed because there is sufficient stock, the stock is then decremented from the bamazon database
             function updateStock(answers) {
 
                 var query = "UPDATE products SET ? WHERE ? ";
-                var newQty = res.stock_quantity - answers.quantity
+                var newQty = res.stock_quantity - answers.quantity;
             
                 connection.query(query, [ {stock_quantity: newQty}, {id: answers.id} ], function(err) {
                       if (err) throw err;
@@ -101,30 +104,26 @@ function placeOrder(answers) {
                     }
                 );
             };
-            console.log(`Your order for ${answers.quantity} unit(s) of the ${res.product_name} has been placed.\nYour total was $` + (res.price * answers.quantity));  
+            console.log(`\n----------------------------------------------------------------------\nYour order for ${answers.quantity} unit(s) of the ${res.product_name} has been placed.\nYour total was $` + (res.price * answers.quantity) + `\n----------------------------------------------------------------------\n`);  
+            orderAgain();
         }
     })
 };
 
 
 
-
-    
-
-
-// ----------------------------------------------------
-
-// Challenge #2: Manager View (Next Level)
-
-// Create a new Node application called bamazonManager.js. Running this application will:
-
-
-// List a set of menu options:
-    // View Products for Sale
-    // View Low Inventory
-    // Add to Inventory
-    // Add New Product
-// If a manager selects View Products for Sale, the app should list every available item: the item IDs, names, prices, and quantities.
-// If a manager selects View Low Inventory, then it should list all items with an inventory count lower than five.
-// If a manager selects Add to Inventory, your app should display a prompt that will let the manager "add more" of any item currently in the store.
-// If a manager selects Add New Product, it should allow the manager to add a completely new product to the store //
+function orderAgain() {
+    inquirer.prompt([
+        {
+            name: "order",
+            type: "confirm",
+            message: "\nWould you like to place another order?"
+        }
+        ]).then(function(answer) {
+           if (answer.order) {
+                displayAllProd();
+           } else {
+                connection.end();
+           }
+        });
+};
