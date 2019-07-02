@@ -83,27 +83,19 @@ function displayAllProd() {
 // Displays all items whose stock has fallen below 5 units
 function lowInv() {
     console.log(`\n----------------------------------------------------------------------\n`);
-    connection.query("SELECT * FROM products", function(err, res) {
+    connection.query("SELECT * FROM products WHERE stock_quantity < 5 ", function(err, res) {
         if (err) throw err;
 
-        for (var i = 0; i < res.length; i++){
-
-            var products = res[i].product_name;
-
-            var stock = res[i].stock_quantity;
-
-                if (stock < 5) {
-                    console.log(`\n${products}`);
-                    userPrompt();
-                    
-                } else {
-                    console.log(`No items have low inventory at this time.\n\n----------------------------------------------------------------------\n`);
-                    userPrompt();
-                    return;
-                }
+        if (res.length > 0) {
+            for (var i = 0; i < res.length; i++){
+                console.log(`\n${res[i].product_name}`);
+            }
+        } else {
+            console.log(`No items have low inventory at this time.\n`);
         }
+        console.log(`\n----------------------------------------------------------------------\n`)
+        userPrompt();
     }) 
-    
 };
 
 // Displays all item ID's and names, takes user input of what item ID they want to add stock to, and adds stock to bamazon database for that item
@@ -152,11 +144,11 @@ function addInv() {
         ]).then(function(answers) {
 
                 var query = "UPDATE products SET ? WHERE ? ";
-                var newQty = res.stock_quantity + answers.quantity;
-            
+                var newQty = parseInt(res[0].stock_quantity) + parseInt(answers.quantity);
+
                 connection.query(query, [ {stock_quantity: newQty}, {id: answers.item} ], function(err) {
                         if (err) throw err;
-                        console.log(`Updated stock to ${newQty}.`);    
+                        console.log(`\n----------------------------------------------------------------------\n\nUpdated stock to ${newQty}.\n\n----------------------------------------------------------------------\n`);    
                         userPrompt();        
                 });
         })
